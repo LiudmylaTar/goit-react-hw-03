@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SearchBox from './components/SearchBox/SearchBox';
 import ContactList from './components/ContactList/ContactList';
 import ContactForm from './components/ContactForm/ContactForm';
@@ -14,9 +14,18 @@ const initialContact = [
 ];
 
 function App() {
-  const [phoneNumbers, setPhoneNumbers] = useState(initialContact);
+  const [phoneNumbers, setPhoneNumbers] = useState(() => {
+    const savedContacts = localStorage.getItem('phoneNumbers');
+    return savedContacts ? JSON.parse(savedContacts) : initialContact;
+  });
+
   const [filter, setFilter] = useState('');
   const [debouncedInputValue] = useDebounce(filter, 300);
+
+  useEffect(() => {
+    localStorage.setItem('phoneNumbers', JSON.stringify(phoneNumbers));
+  }, [phoneNumbers]);
+
   const addContact = (newContact) => {
     setPhoneNumbers((prevContacts) => {
       return [...prevContacts, newContact];
